@@ -1,1 +1,0 @@
-const I18N={es:{a_title:'🎁 Amigo Secreto Navideño 🎄'},en:{a_title:'🎁 Secret Santa Exchange 🎄'}};

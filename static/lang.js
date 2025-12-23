@@ -1,1 +1,0 @@
-function t(k){return (I18N[localStorage.lang||'es']||{})[k]||k}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Participant - Exchange of Presents</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+<link href="static/styles.css" rel="stylesheet">
+</head>
+
+<body class="container mt-4">
+
+<div class="text-end mb-3">
+  <button class="btn btn-sm btn-outline-secondary" onclick="setLanguage('es')" data-i18n="lang_es"></button>
+  <button class="btn btn-sm btn-outline-secondary" onclick="setLanguage('en')" data-i18n="lang_en"></button>
+</div>
+
+<div class="text-center mb-4">
+  <h1 class="titulo-navidad" data-i18n="p_title"></h1>
+  <p class="subtitulo-navidad" data-i18n="p_subtitle"></p>
+</div>
+
+<div class="card shadow">
+  <div class="card-header bg-success text-white fw-bold" data-i18n="p_formTitle"></div>
+
+  <div class="card-body">
+    <input id="nombre" class="form-control mb-2" data-i18n-placeholder="ph_name">
+    <input id="whatsapp" class="form-control mb-2" data-i18n-placeholder="ph_whatsapp">
+    <input id="r1" class="form-control mb-2" data-i18n-placeholder="ph_gift1">
+    <input id="r2" class="form-control mb-2" data-i18n-placeholder="ph_gift2">
+    <input id="r3" class="form-control mb-3" data-i18n-placeholder="ph_gift3">
+
+    <button class="btn btn-navidad w-100" onclick="enviar()" data-i18n="p_sendBtn"></button>
+  </div>
+</div>
+
+<div class="footer-navidad text-center mt-4" data-i18n="p_footer"></div>
+
+<script src="static/i18n.js"></script>
+<script src="static/lang.js"></script>
+<script src="static/config.js"></script>
+
+<script>
+const intercambioId = new URLSearchParams(window.location.search).get("id");
+
+function api(path) {
+  return `${window.BACKEND_BASE_URL}${path}`;
+}
+
+function enviar() {
+  if (!intercambioId) {
+    alert(t("msg_invalid_link"));
+    return;
+  }
+
+  fetch(api("/api/participante"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      intercambio_id: intercambioId,
+      nombre: nombre.value,
+      whatsapp: whatsapp.value,
+      regalos: [r1.value, r2.value, r3.value]
+    })
+  })
+  .then(r => {
+    if (!r.ok) throw new Error();
+    alert(t("msg_success"));
+  })
+  .catch(() => alert(t("msg_error")));
+}
+</script>
+
+</body>
+</html>

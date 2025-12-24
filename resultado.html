@@ -1,0 +1,12 @@
+
+<!DOCTYPE html><html><body>
+<h2>Resultado</h2><div id="r"></div>
+<script src="static/config.js"></script>
+<script>
+const iid=new URLSearchParams(location.search).get('id')
+const token=localStorage.getItem('token')
+function api(p){return BACKEND_BASE_URL+p}
+fetch(api(`/api/intercambio/${iid}/resultado?token=${token}`))
+.then(r=>r.json()).then(d=>r.innerHTML=`Te tocó: ${d.recibe}`)
+</script>
+</body></html>

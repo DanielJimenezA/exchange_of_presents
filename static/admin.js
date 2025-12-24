@@ -30,6 +30,20 @@ function mensajeWhatsApp(da, recibe, regalos) {
   ].join("\n");
 }
 
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <label class="fw-bold">Buscar intercambio existente</label>
+    <div class="input-group">
+      <input id="buscarId"
+             class="form-control"
+             placeholder="Ej. NAV-1A2B3C4D">
+      <button class="btn btn-outline-primary" onclick="buscarIntercambio()">
+        Buscar
+      </button>
+    </div>
+  </div>
+</div>
+
 async function generarId() {
   intercambioId = "NAV-" + crypto.randomUUID().slice(0, 8).toUpperCase();
   document.getElementById("id").value = intercambioId;
@@ -129,3 +143,33 @@ function abrirLink() {
 document.addEventListener("DOMContentLoaded", () => {
   setInterval(refreshAll, 5000);
 });
+
+async function buscarIntercambio() {
+  const id = document.getElementById("buscarId").value.trim();
+  if (!id) {
+    alert("Ingresa un ID de intercambio");
+    return;
+  }
+
+  try {
+    const res = await fetch(api(`/api/intercambio/${id}`));
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+
+    intercambioId = data.id;
+    document.getElementById("id").value = data.id;
+
+    alert(
+      `Intercambio cargado\n\n` +
+      `Participantes: ${data.total_participantes}\n` +
+      `Cerrado: ${data.cerrado ? "Sí" : "No"}\n` +
+      `Sorteado: ${data.sorteado ? "Sí" : "No"}`
+    );
+
+    refreshAll(); // reutiliza lo que ya tienes
+  } catch {
+    alert("❌ Intercambio no encontrado");
+  }
+}
+

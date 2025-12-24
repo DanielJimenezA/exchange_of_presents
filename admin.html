@@ -19,15 +19,31 @@
   </nav>
 
   <main class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <span class="small-muted">Backend:</span>
-        <code id="backendUrl"></code>
-        <span id="backendBadge" class="badge text-bg-secondary ms-2">Verificando…</span>
+    <div class="card shadow mb-3">
+      <div class="card-header bg-warning fw-bold">Acceso de Administrador</div>
+      <div class="card-body">
+        <label class="form-label fw-bold">Admin Token</label>
+        <div class="input-group">
+          <input id="adminToken" class="form-control" placeholder="Pega tu token admin">
+          <button class="btn btn-outline-primary" onclick="guardarToken()">Guardar</button>
+        </div>
+        <div class="small text-muted mt-2">
+          Se guarda en este navegador (localStorage). Los participantes no lo ven.
+        </div>
       </div>
-      <button class="btn btn-outline-secondary btn-sm" onclick="localStorage.removeItem('backend_url'); location.reload();">
-        Cambiar backend
-      </button>
+    </div>
+
+    <div class="card shadow mb-3">
+      <div class="card-header bg-success text-white fw-bold">Buscar intercambio existente</div>
+      <div class="card-body">
+        <div class="input-group">
+          <input id="buscarId" class="form-control" placeholder="Ej. NAV-1A2B3C4D">
+          <button class="btn btn-outline-light btn-success" onclick="buscarIntercambio()">Buscar</button>
+        </div>
+        <div class="small text-muted mt-2">
+          Carga contador, participantes y estado para operar ese intercambio.
+        </div>
+      </div>
     </div>
 
     <div class="card shadow mb-4">
@@ -37,7 +53,12 @@
           <button class="btn btn-navidad" onclick="generarId()">Generar ID</button>
           <button class="btn btn-primary" onclick="sortear()">Realizar sorteo</button>
           <button class="btn btn-danger" onclick="cerrarIntercambio()">Cerrar intercambio</button>
+
+          <button class="btn btn-outline-secondary" onclick="resetIntercambio()">Reset (reabrir + quitar sorteo)</button>
+          <button class="btn btn-outline-danger" onclick="eliminarIntercambio()">Eliminar intercambio</button>
+
           <button class="btn btn-success" onclick="exportarExcel()">Exportar Excel</button>
+          <button class="btn btn-outline-info" onclick="cargarHistorial()">Historial</button>
         </div>
 
         <hr>
@@ -58,7 +79,6 @@
               <button class="btn btn-outline-secondary" onclick="copiar('link')">Copiar</button>
               <button class="btn btn-outline-success" onclick="abrirLink()">Abrir</button>
             </div>
-            <div class="small-muted mt-1">Los participantes se registran en ese link y el backend les devuelve un token.</div>
           </div>
 
           <div class="col-md-12 text-center mt-3">
@@ -68,6 +88,7 @@
 
         <div class="alert alert-info mt-3 mb-0">
           Participantes registrados: <span id="contador" class="fw-bold">0</span>
+          <span class="ms-3">Estado: <span id="estado" class="fw-bold">—</span></span>
         </div>
 
         <div id="toast" class="alert d-none mt-3" role="alert"></div>
@@ -84,16 +105,16 @@
               <th>Nombre</th>
               <th>WhatsApp</th>
               <th>Regalos</th>
-              <th style="width: 280px">Token</th>
+              <th style="width: 260px">Token</th>
+              <th style="width: 160px">Recibe</th>
             </tr>
           </thead>
           <tbody id="tablaParticipantes"></tbody>
         </table>
-        <div class="small-muted">Tip: el token permite consultar resultado en <code>resultado.html?id=&lt;ID&gt;</code> desde el mismo navegador o si el admin se lo comparte.</div>
       </div>
     </div>
 
-    <div class="card shadow">
+    <div class="card shadow mb-4">
       <div class="card-header bg-danger text-white fw-bold">Sorteo final (persistente)</div>
       <div class="card-body table-responsive">
         <table class="table table-bordered align-middle text-center">
@@ -102,12 +123,29 @@
               <th style="width: 60px">#</th>
               <th>Da regalo</th>
               <th>Recibe</th>
-              <th style="width: 180px">WhatsApp</th>
+              <th style="width: 200px">WhatsApp</th>
             </tr>
           </thead>
           <tbody id="tablaSorteo"></tbody>
         </table>
-        <div class="small-muted">Al realizar el sorteo, se guarda en la base. Si vuelves a presionar, regresa el mismo resultado.</div>
+      </div>
+    </div>
+
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white fw-bold">Historial de intercambios</div>
+      <div class="card-body table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light text-center">
+            <tr>
+              <th>ID</th>
+              <th>Total</th>
+              <th>Cerrado</th>
+              <th>Sorteado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaHistorial"></tbody>
+        </table>
       </div>
     </div>
 

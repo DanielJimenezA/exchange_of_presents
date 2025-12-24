@@ -1,28 +1,17 @@
-/**
- * Backend URL selection:
- * - If you're running locally, it defaults to http://127.0.0.1:8000
- * - If you're on GitHub Pages and haven't set it, it will prompt you once.
- *
- * You can always override via console:
- *   localStorage.setItem('backend_url','https://your-backend.onrender.com'); location.reload();
- */
-(function () {
-  const isLocal = location.hostname === "127.0.0.1" || location.hostname === "localhost";
-  const DEFAULT_LOCAL = "http://127.0.0.1:8000";
-  const saved = localStorage.getItem("backend_url");
+// ===============================
+// CONFIGURACIÓN GLOBAL DEL BACKEND
+// ===============================
 
-  function normalize(u){ return (u || "").trim().replace(/\/$/, ""); }
+// 🔴 PRODUCCIÓN (AZURE)
+const BACKEND_PROD = "https://exchange-of-presents-api.azurewebsites.net";
 
-  let url = normalize(saved);
+// 🟡 DESARROLLO LOCAL (opcional)
+const BACKEND_LOCAL = "http://127.0.0.1:8000";
 
-  if (!url) {
-    if (isLocal) {
-      url = DEFAULT_LOCAL;
-    } else {
-      url = normalize(prompt("Pega la URL pública del backend (Render/Railway), ej: https://xxxx.onrender.com", ""));
-      if (url) localStorage.setItem("backend_url", url);
-    }
-  }
+// Detectar si estamos en localhost
+const isLocal =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1";
 
-  window.BACKEND_BASE_URL = url;
-})();
+// Selección automática
+window.BACKEND_BASE_URL = isLocal ? BACKEND_LOCAL : BACKEND_PROD;

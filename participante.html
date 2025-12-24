@@ -1,18 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Participante | Exchange of Presents</title>
 
-<!DOCTYPE html><html><body>
-<input id="nombre"><input id="whatsapp"><input id="r1"><input id="r2"><input id="r3">
-<button onclick="send()">Enviar</button>
-<script src="static/config.js"></script>
-<script>
-const iid=new URLSearchParams(location.search).get('id')
-function api(p){return BACKEND_BASE_URL+p}
-function send(){
- fetch(api('/api/participante'),{method:'POST',headers:{'Content-Type':'application/json'},
- body:JSON.stringify({intercambio_id:iid,nombre:nombre.value,whatsapp:whatsapp.value,regalos:[r1.value,r2.value,r3.value]})})
- .then(r=>r.json()).then(d=>{
-   localStorage.setItem('token',d.token)
-   alert('Registrado')
- })
-}
-</script>
-</body></html>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+  <link href="static/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-danger shadow">
+    <div class="container d-flex flex-column align-items-center py-2">
+      <span class="navbar-brand titulo-navidad mb-0">🎁 Amigo Secreto 🎄</span>
+      <span class="subtitulo-navidad">Intercambio División de Sistemas de Información</span>
+    </div>
+  </nav>
+
+  <main class="container my-4" style="max-width: 720px;">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white fw-bold">
+        Captura tus opciones de regalo
+      </div>
+      <div class="card-body">
+        <div id="alert" class="alert d-none" role="alert"></div>
+
+        <div class="mb-2 small-muted">ID del intercambio: <code id="exchangeId"></code></div>
+        <div class="mb-2 small-muted">Backend: <code id="backendUrl"></code></div>
+
+        <label class="form-label fw-bold">Nombre</label>
+        <input id="nombre" class="form-control mb-3" placeholder="Tu nombre">
+
+        <label class="form-label fw-bold">WhatsApp</label>
+        <input id="whatsapp" class="form-control mb-3" placeholder="521XXXXXXXXXX">
+
+        <label class="form-label fw-bold">Opción 1</label>
+        <input id="r1" class="form-control mb-3" placeholder="Regalo 1">
+
+        <label class="form-label fw-bold">Opción 2</label>
+        <input id="r2" class="form-control mb-3" placeholder="Regalo 2">
+
+        <label class="form-label fw-bold">Opción 3</label>
+        <input id="r3" class="form-control mb-3" placeholder="Regalo 3">
+
+        <button class="btn btn-navidad w-100" onclick="enviar()">Enviar</button>
+
+        <div class="small-muted mt-3">
+          Después del registro, tu dispositivo guarda un <b>token</b> para consultar el resultado.
+        </div>
+
+        <a class="btn btn-outline-secondary w-100 mt-3" href="resultado.html" onclick="this.href='resultado.html?id='+encodeURIComponent(new URLSearchParams(location.search).get('id')||'');">
+          Ver resultado (cuando esté disponible)
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-navidad text-center mt-4 mb-5">
+      🎄 Exchange of Presents 🎁
+    </div>
+  </main>
+
+  <script src="static/config.js"></script>
+  <script src="static/participante.js"></script>
+</body>
+</html>

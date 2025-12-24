@@ -1,26 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin | Exchange of Presents</title>
 
-<!DOCTYPE html><html><head>
-<link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
-<link href="static/styles.css" rel="stylesheet">
-</head><body class="container">
-<h1 class="titulo-navidad">🎁 Admin 🎄</h1>
-<button onclick="gen()">Generar ID</button>
-<input id="id" readonly>
-<button onclick="cerrar()">Cerrar</button>
-<button onclick="sorteo()">Sortear</button>
-<div id="out"></div>
-<script src="static/config.js"></script>
-<script>
-function api(p){return BACKEND_BASE_URL+p}
-let iid=''
-function gen(){
- iid="NAV-"+crypto.randomUUID().slice(0,8).toUpperCase()
- document.getElementById('id').value=iid
- fetch(api('/api/intercambio/crear'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intercambio_id:iid})})
-}
-function cerrar(){ fetch(api(`/api/intercambio/${iid}/cerrar`),{method:'POST'}) }
-function sorteo(){
- fetch(api(`/api/intercambio/${iid}/sorteo`),{method:'POST'}).then(r=>r.json()).then(d=>out.innerHTML=JSON.stringify(d,null,2))
-}
-</script>
-</body></html>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+  <link href="static/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-danger shadow">
+    <div class="container d-flex flex-column align-items-center py-2">
+      <span class="navbar-brand titulo-navidad mb-0">🎁 Amigo Secreto 🎄</span>
+      <span class="subtitulo-navidad">Intercambio División de Sistemas de Información</span>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <span class="small-muted">Backend:</span>
+        <code id="backendUrl"></code>
+        <span id="backendBadge" class="badge text-bg-secondary ms-2">Verificando…</span>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm" onclick="localStorage.removeItem('backend_url'); location.reload();">
+        Cambiar backend
+      </button>
+    </div>
+
+    <div class="card shadow mb-4">
+      <div class="card-header bg-warning fw-bold">Panel del Administrador</div>
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-navidad" onclick="generarId()">Generar ID</button>
+          <button class="btn btn-primary" onclick="sortear()">Realizar sorteo</button>
+          <button class="btn btn-danger" onclick="cerrarIntercambio()">Cerrar intercambio</button>
+          <button class="btn btn-success" onclick="exportarExcel()">Exportar Excel</button>
+        </div>
+
+        <hr>
+
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label fw-bold">ID del intercambio</label>
+            <div class="input-group">
+              <input id="id" class="form-control text-center fw-bold" readonly>
+              <button class="btn btn-outline-secondary" onclick="copiar('id')">Copiar</button>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label fw-bold">Link para participantes</label>
+            <div class="input-group">
+              <input id="link" class="form-control" readonly>
+              <button class="btn btn-outline-secondary" onclick="copiar('link')">Copiar</button>
+              <button class="btn btn-outline-success" onclick="abrirLink()">Abrir</button>
+            </div>
+            <div class="small-muted mt-1">Los participantes se registran en ese link y el backend les devuelve un token.</div>
+          </div>
+
+          <div class="col-md-12 text-center mt-3">
+            <img id="qr" class="img-fluid border rounded p-2" style="max-width: 220px" alt="QR">
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-3 mb-0">
+          Participantes registrados: <span id="contador" class="fw-bold">0</span>
+        </div>
+
+        <div id="toast" class="alert d-none mt-3" role="alert"></div>
+      </div>
+    </div>
+
+    <div class="card shadow mb-4">
+      <div class="card-header bg-success text-white fw-bold">Participantes</div>
+      <div class="card-body table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr class="text-center">
+              <th style="width: 60px">#</th>
+              <th>Nombre</th>
+              <th>WhatsApp</th>
+              <th>Regalos</th>
+              <th style="width: 280px">Token</th>
+            </tr>
+          </thead>
+          <tbody id="tablaParticipantes"></tbody>
+        </table>
+        <div class="small-muted">Tip: el token permite consultar resultado en <code>resultado.html?id=&lt;ID&gt;</code> desde el mismo navegador o si el admin se lo comparte.</div>
+      </div>
+    </div>
+
+    <div class="card shadow">
+      <div class="card-header bg-danger text-white fw-bold">Sorteo final (persistente)</div>
+      <div class="card-body table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 60px">#</th>
+              <th>Da regalo</th>
+              <th>Recibe</th>
+              <th style="width: 180px">WhatsApp</th>
+            </tr>
+          </thead>
+          <tbody id="tablaSorteo"></tbody>
+        </table>
+        <div class="small-muted">Al realizar el sorteo, se guarda en la base. Si vuelves a presionar, regresa el mismo resultado.</div>
+      </div>
+    </div>
+
+    <div class="footer-navidad text-center mt-4 mb-5">
+      🎄 Exchange of Presents 🎁
+    </div>
+  </main>
+
+  <script src="static/config.js"></script>
+  <script src="static/admin.js"></script>
+</body>
+</html>

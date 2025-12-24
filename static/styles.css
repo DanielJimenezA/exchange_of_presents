@@ -1,6 +1,8 @@
-
-body { background: linear-gradient(180deg,#fff5f5,#fff); }
-.titulo-navidad { font-family:"Mountains of Christmas",cursive;font-size:2.5rem;color:#b91c1c }
-.subtitulo-navidad { font-family:"Mountains of Christmas",cursive;font-size:1.3rem;color:#14532d }
-.btn-navidad { background:#b91c1c;color:#fff }
-.footer-navidad { color:#6b7280;font-size:.9rem }
+body { background: linear-gradient(180deg, #fff5f5, #ffffff); }
+.titulo-navidad { font-family: "Mountains of Christmas", cursive; font-size: 2.4rem; color: #b91c1c; text-shadow: 2px 2px 4px rgba(0,0,0,.15); }
+.subtitulo-navidad { font-family: "Mountains of Christmas", cursive; font-size: 1.35rem; color: #14532d; }
+.btn-navidad { background-color: #b91c1c; color: #fff; border: none; }
+.btn-navidad:hover { background-color: #991b1b; color: #fff; }
+.card { border-radius: 16px; }
+code { user-select: all; }
+.small-muted { color: #6b7280; font-size: .9rem; }
